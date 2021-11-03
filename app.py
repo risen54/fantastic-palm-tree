@@ -1,38 +1,57 @@
-import psutil
-import wikipedia
+# Python Jarvis
+
+# modules which need installation
+import psutil  # pip install psutil
+import pyttsx3  # pip install pyttsx3
+import wikipedia  # pip install wikipedia
+from gpiozero import CPUTemperature  # pip install gpiozero
+import speech_recognition as sr  # pip install speechRecognition
+
+# modules which do not need installation
 import datetime
 import random
-from subprocess import run
+import subprocess
 import webbrowser
-import speech_recognition as sr
-import pyttsx3
 import os
 
+
+# voice setup
 engine = pyttsx3.init('sapi5')
+engine.setProperty('rate',205)  #speed of speech
+engine.setProperty('volume', 1)  #volume low(0) and high(1) 
+engine.setProperty('voice', 'en')
 voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[0].id)
 
-prefixes = ['Sir', 'Officer', 'Captain']
-prefix = random.choice(prefixes)
+
+# Some variables
+pronouns = ['Sir', 'Officer', 'Captain']
+pronoun = random.choice(pronouns)
+# Paths
+google_path = r'C:\Program Files\Google\Chrome\Application\chrome.exe'
+vsc_path = r'C:\Users\admin\AppData\Local\Programs\Microsoft VS Code\Code.exe'
+yt_path = r'https:\\www.youtube.com'
 
 
+
+# Funtion to let the bot speak
 def speak(audio):
     engine.say(audio)
     engine.runAndWait()
 
 
-def greet():
+def greet():  # Makes the bot greet you according to the time
     hour = int(datetime.datetime.now().hour)
     if hour >= 6 and hour < 12:
-        greeting = f"Good Morning {prefix}!"
+        greeting = f"Good Morning {pronoun}!"
         print(greeting)
         speak(greeting)
     elif hour >= 12 and hour < 17:
-        greeting = f"Good Afternoon {prefix}!"
+        greeting = f"Good Afternoon {pronoun}!"
         print(greeting)
         speak(greeting)
     elif hour >= 17 and hour < 21:
-        greeting = f"Good Evening {prefix}!"
+        greeting = f"Good Evening {pronoun}!"
         print(greeting)
         speak(greeting)
     else:
@@ -41,59 +60,77 @@ def greet():
         speak(greeting)
 
 
-def take_command():
-    r = sr.Recognizer()
-    with sr.Microphone() as source:
-        print('Listening...')
-        r.adjust_for_ambient_noise(source,duration=1)
-        r.pause_threshold = 0.8
-        audio = r.listen(source)
+def take_command():  # Receives and evaluates the given command
+    while True:
+        r = sr.Recognizer()
+        with sr.Microphone() as source:
+            print('Listening...')
+            r.adjust_for_ambient_noise(source, duration=1)
+            r.pause_threshold = 0.8
+            audio = r.listen(source)
+            
+            print('recognizing')
+            query = r.recognize_google(audio, language='en-in').lower()
+            print(f'Command: {query}\n')
+            
+            # Functions
+            # Add Emotions!!!!!!!!!!!!! 🤖
+            if 'carl' in query or 'car' in query:
+                try:
 
-    try:
-        print('recognizing')
-        query = r.recognize_google(audio, language='en-in').lower()
-        print(f'Command: {query}\n')
-        # Functions
+                    if 'open youtube' in query:
+                        webbrowser.WindowsDefault().open(yt_path)
 
-        if 'open youtube' in query:
-            webbrowser.Chrome.open('www.youtube.com')
-        elif 'open google' in query:
-            google_path = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
-            run(google_path)
-        elif 'exit' in query or 'close' in query or 'quit' in query:
-            exit()
-        elif 'stats' in query or 'health' in query:
-            heat = int()
-            usage = int(psutil.cpu_percent())
-            stats = f"your cpu is running at {heat} with {usage} percent of the cpu being utilized"
-        elif "wikipedia" in query:
-            search_thing = query.replace("wikipedia", "")
-            rezults = wikipedia.search(search_thing, 3)
-            print(rezults)
-            speak(rezults)
-    except Exception:
-        speak("Please say again")
-        print("Please say again")
-        return 'None'
+                    elif 'open google' in query:
+                        subprocess.run(google_path)
 
-    return query
+                    elif 'exit' in query or 'close' in query or 'quit' in query:
+                        exit()
+
+                    elif 'stats' in query \
+                    or 'health' in query \
+                    or 'statistics' in query:
+                        heat = CPUTemperature()
+                        usage = int(psutil.cpu_percent())
+                        stats = f"""your cpu is running at {heat} \
+                        with {usage} percent of the cpu being utilized"""
+                        print(stats)
+                        speak(stats)
+
+                    elif 'wikipedia' in query:
+                        speak("Searching...")
+                        query = query.replace("wikipedia", "")
+                        results = wikipedia.summary(query, sentences=3)
+                        speak("According  to Wikipedia...")
+                        print(results)
+                        speak(results)
+
+                    elif 'open main folder' in query \
+                    or 'open blizzard' in query \
+                    or 'open my main folder' in query \
+                    or 'open my folder' in query:
+
+                        subprocess.Popen(r'explorer /open,"G:\Blizzard\"')
+
+                    elif 'open code' in query or \
+                    'open visual studio code' in query:
+                        speak("Opening VSC")
+                        subprocess.run(vsc_path)
+
+                    elif 'introduce yourself' in query\
+                    or 'what can you do':
+                        print()
+
+                    # play music function
+                except Exception:
+                    print("Please say again")
+                    speak("Please say again")
+                    return 'None'
+                return query
+            else:
+                continue
 
 
 if __name__ == '__main__':
     greet()
-    while True:
-        try:
-            r = sr.Recognizer()
-            with sr.Microphone() as source:
-                r.adjust_for_ambient_noise(source,duration=1)
-                r.pause_threshold = 0.8
-                audio = r.listen(source)
-            query = r.recognize_google(audio, language='en-in').lower()
-            if 'hello' in query:
-                take_command()
-            else:
-                continue
-        except Exception as e:
-            print("Please say again")
-            speak("Please say again")
-            print(e)
+    take_command()

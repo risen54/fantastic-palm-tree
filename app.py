@@ -30,7 +30,8 @@ pronoun = random.choice(pronouns)
 # Paths
 google_path = r'C:\Program Files\Google\Chrome\Application\chrome.exe'
 vsc_path = r'C:\Users\admin\AppData\Local\Programs\Microsoft VS Code\Code.exe'
-yt_path = r'https:\\www.youtube.com'
+yt_path = r'https://www.youtube.com'
+github_path = r'https://www.github.com/Risen54'
 
 
 
@@ -75,60 +76,92 @@ def take_command():  # Receives and evaluates the given command
             
             # Functions
             # Add Emotions!!!!!!!!!!!!! 🤖
-            if 'carl' in query or 'car' in query:
-                try:
+            try:
 
-                    if 'open youtube' in query:
-                        webbrowser.WindowsDefault().open(yt_path)
+                if 'open youtube' in query:
+                    webbrowser.WindowsDefault().open(yt_path)
 
-                    elif 'open google' in query:
-                        subprocess.run(google_path)
+                elif 'open google' in query:
+                    subprocess.run(google_path)
 
-                    elif 'exit' in query or 'close' in query or 'quit' in query:
-                        exit()
+                elif 'exit' in query or 'close' in query or 'quit' in query:
+                    exit()
 
-                    elif 'stats' in query \
-                    or 'health' in query \
-                    or 'statistics' in query:
-                        heat = CPUTemperature()
-                        usage = int(psutil.cpu_percent())
-                        stats = f"""your cpu is running at {heat} \
-                        with {usage} percent of the cpu being utilized"""
-                        print(stats)
-                        speak(stats)
+                elif 'stats' in query \
+                or 'health' in query \
+                or 'statistics' in query:
+                    heat = CPUTemperature()
+                    usage = int(psutil.cpu_percent())
+                    stats = f"""your cpu is running at {heat} \
+                    with {usage} percent of the cpu being utilized"""
+                    print(stats)
+                    speak(stats)
 
-                    elif 'wikipedia' in query:
-                        speak("Searching...")
-                        query = query.replace("wikipedia", "")
-                        results = wikipedia.summary(query, sentences=3)
-                        speak("According  to Wikipedia...")
-                        print(results)
-                        speak(results)
+                elif 'wikipedia' in query:
+                    speak("Searching...")
+                    query = query.replace("wikipedia", "")
+                    results = wikipedia.summary(query, sentences=3)
+                    speak("According  to Wikipedia...")
+                    print(results)
+                    speak(results)
 
-                    elif 'open main folder' in query \
-                    or 'open blizzard' in query \
-                    or 'open my main folder' in query \
-                    or 'open my folder' in query:
+                elif 'open main folder' in query \
+                or 'open blizzard' in query \
+                or 'open my main folder' in query \
+                or 'open my folder' in query:
 
-                        subprocess.Popen(r'explorer /open,"G:\Blizzard\"')
+                    subprocess.Popen(r'explorer /open,"G:\Blizzard\"')
 
-                    elif 'open code' in query or \
-                    'open visual studio code' in query:
-                        speak("Opening VSC")
-                        subprocess.run(vsc_path)
+                elif 'open code' in query or \
+                'open visual studio code' in query:
+                    speak("Opening VSC")
+                    subprocess.run(vsc_path)
 
-                    elif 'introduce yourself' in query\
-                    or 'what can you do':
-                        print()
+                elif 'introduce yourself' in query\
+                or 'what can you do':
+                    intro = """
+                    I am you personal voice assistant.
+                    I can help you with stuff like reminding your tasks,
+                    give information about something,
+                    helping you with small things and
+                    making your work fast"""
+                    print(intro)
+                    speak(intro)
 
-                    # play music function
-                except Exception:
-                    print("Please say again")
-                    speak("Please say again")
-                    return 'None'
-                return query
-            else:
-                continue
+                # Tell time function
+                elif 'the time' in query:
+                    time = datetime.datetime.now().strftime("%H:%M:%S")
+                    print(time)
+                    speak(time)
+                
+                # Tell date function
+                elif 'the date' in query:
+                    date = datetime.datetime.now().strftime("%d/%m/%Y")
+                    print(date)
+                    speak(date)
+                
+                # Tell day function
+                elif 'the day' in query:
+                    day = datetime.datetime.now().strftime("%A")
+                    print(day)
+                    speak(day)
+                
+                # Flip coin function
+                elif 'flip coin' in query:
+                    flip = random.choice(['heads', 'tails'])
+                    print(flip)
+                    speak(flip)
+
+                # Open Github function
+                elif 'open github' in query:
+                    webbrowser.WindowsDefault().open(github_path)
+
+                else:
+                    continue
+            except Exception:
+                print("Please say again")
+                return 'None'
+            return query
 
 
 if __name__ == '__main__':
